@@ -1,33 +1,32 @@
 'use strict';
 
 // Declare app level module which depends on views, and components
-angular.module('myApp', [
-  'ngRoute',
-  'myApp.view1',
-  'myApp.view2',
-  'myApp.version'
-]).
+angular.module('myApp', ['firebase', 'ui.router'])
+	.config(function($stateProvider, $urlRouterProvider) {
+		$stateProvider
+			.state('list', {
+				url: '/',
+				controller: 'ListController',
+				templateUrl: 'views/list.html'
+			})
+			.state('person', {
+				url: '/{username}',
+				controller: 'PersonController',
+				templateUrl: 'views/person.html'
+			});
 
-angular.module("myApp", ["firebase"]);
+		$urlRouterProvider.otherwise('/');
+	})
+	.controller('ListController', function($scope, $firebase) {
+		var fire = $firebase(new Firebase('https://nbs.firebaseio.com/'));
 
-angular.module('myApp', ['firebase'])
-.controller("MyCtrl", ["$scope", "$firebase",
-  function($scope, $firebase) {
-    // Our controller definition goes here
-  }
-]);
+		$scope.people = fire.$asArray();
+	})
+	.controller('PersonController', function($scope, $firebase, $stateParams) {
+		var fire = $firebase(new Firebase('https://nbs.firebaseio.com/'));
+		var people = fire.$asArray();
 
-angular.module('myApp')
-.controller("MyCtrl", function($scope, $firebase) {
-  // Firebase URL
-  var URL = "https://nbs.firebase.com";
-  // Synchronizing the items on our $scope
-  $scope.items = $firebase(new Firebase(URL + '/items'));
-});
-
-$scope.items.hello = "baz";
-$scope.items.$save("hello");  // new Firebase(URL + "/foo") now contains "baz".
-
-config(['$routeProvider', function($routeProvider) {
-  $routeProvider.otherwise({redirectTo: '/view1'});
-}]);
+		people.$loaded().then(function(people) {
+			$scope.person = _(people).find({ username: $stateParams.username });
+		});
+	});

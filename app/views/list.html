@@ -1,0 +1,23 @@
+<ul>
+    <li ng-repeat="(id, person) in people">
+      {{person.name}}
+      <a ng-href="mailto:{{person.email}}">{{person.email}}</a>
+      <a ng-href="http://twitter.com/{{person.twitter}}">{{person.twitter}}</a>
+      <a ui-sref="person({ username: person.username })">view</a>
+    </li>
+</ul>
+<form ng-submit="people.$add(newPerson)">
+  <label>Username</label>
+  <input type="text" ng-model="newPerson.username">
+  <br>
+  <label>Name</label>
+  <input type="text" ng-model="newPerson.name">
+  <br>
+  <label>Email</label>
+  <input type="email" ng-model="newPerson.email">
+  <br>
+  <label>Twitter</label>
+  <input type="text" ng-model="newPerson.twitter">
+  <br>
+  <button type="submit">Add Person</button>
+</form>
